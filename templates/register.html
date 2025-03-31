@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f6b5b7 !important;
+    }
+    .content-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding-top: 20px;
+    }
+    
+    .register-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        width: 350px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    h2 {
+        font-weight: bold;
+        color: #eb639c;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #747272;
+        text-align: left;
+        width: 100%;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #747272;
+    }
+
+    .btn-register {
+        background-color: #eb639c;
+        color: white;
+        font-weight: bold;
+        width: 100%;
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 10px;
+    }
+
+    .btn-register:hover {
+        background-color: #d84f87;
+    }
+
+    .login-link {
+        font-size: 14px;
+        color: #747272;
+    }
+
+    .login-link a {
+        color: #eb639c;
+        text-decoration: underline;
+        font-weight: bold;
+    }
+</style>
+
+<div class="content-container">
+    <div class="register-card">
+        <h2>Registro</h2>
+
+        <form id="register-form">
+            <div class="mb-3">
+                <label class="form-label">Usuaria</label>
+                <input type="text" id="new-username" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <input type="password" id="new-password" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Edad</label>
+                <input type="number" id="new-age" class="form-control" required min="18">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">¿Ha estado embarazada?</label>
+                <select id="new-pregnant" class="form-control">
+                    <option value="no">No</option>
+                    <option value="si">Sí</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-register">Registrarse</button>
+        </form>
+
+        <p class="login-link mt-3">
+            ¿Ya tienes cuenta? <a href="/login">Iniciar Sesión</a>
+        </p>
+    </div>
+</div>
+
+<script>
+document.getElementById("register-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    let username = document.getElementById("new-username").value.trim();
+    let password = document.getElementById("new-password").value.trim();
+    let age = parseInt(document.getElementById("new-age").value);
+    let pregnant = document.getElementById("new-pregnant").value;
+
+    if (!username || !password) {
+        alert("Todos los campos son obligatorios.");
+        return;
+    }
+    if (age < 18) {
+        alert("Debes ser mayor de 18 años para registrarte.");
+        return;
+    }
+
+    let userData = {
+        username: username,
+        password: password,
+        age: age,
+        had_pregnancy: pregnant === "si"
+    };
+
+    try {
+        let response = await fetch("/users/register/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData)
+        });
+
+        let result = await response.json();
+
+        if (response.ok) {
+            alert("Registro exitoso 🎉");
+            window.location.href = "/login";  
+        } else {
+            alert("Error: " + result.detail);
+        }
+    } catch (error) {
+        alert("Error en la conexión con el servidor.");
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f6b5b7 !important;
+    }
+
+    .content-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding-top: 20px;
+    }
+
+    .login-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        width: 350px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    h2 {
+        font-weight: bold;
+        color: #eb639c;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #747272;
+        text-align: left;
+        width: 100%;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #747272;
+    }
+
+    .btn-login {
+        background-color: #eb639c;
+        color: white;
+        font-weight: bold;
+        width: 100%;
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 10px;
+    }
+
+    .btn-login:hover {
+        background-color: #d84f87;
+    }
+
+    .register-link {
+        font-size: 14px;
+        color: #747272;
+    }
+
+    .register-link a {
+        color: #eb639c;
+        text-decoration: underline;
+        font-weight: bold;
+    }
+</style>
+
+<div class="content-container">
+    <div class="login-card">
+        <h2>Iniciar Sesión</h2>
+
+        <form id="login-form">
+            <div class="mb-3">
+                <label class="form-label">Usuaria</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+            </div>
+        
+            <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+        
+            <button type="submit" class="btn btn-login">Ingresar</button>
+        </form>
+        
+        <p class="register-link mt-3">
+            ¿No tienes cuenta? <a href="/register">Regístrate</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    document.getElementById("login-form").addEventListener("submit", async function(event) {
+        event.preventDefault();
+    
+        let formData = new FormData(this);
+    
+        try {
+            let response = await fetch("/login", {
+                method: "POST",
+                body: formData
+            });
+    
+            let result = await response.json();
+    
+            if (response.ok) {
+                alert("Inicio de sesión exitoso 🎉");
+                window.location.href = result.redirect;  // Redirige al panel de reportes
+            } else {
+                alert("Error: " + result.detail);
+            }
+        } catch (error) {
+            alert("Error en la conexión con el servidor.");
+        }
+    });
+</script>
+    
+
+{% endblock %}

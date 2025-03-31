@@ -1,0 +1,74 @@
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Personalización de Navbar */
+.navbar-nav .nav-link {
+    font-weight: 600;
+    color: #333;
+    transition: color 0.3s ease-in-out;
+}
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link:hover {
+    color: #e91e63;
+}
+
+/* Botón Personalizado */
+.btn-primary {
+    background-color: #e91e63;
+    border: none;
+}
+.btn-primary:hover {
+    background-color: #d81b60;
+}
+
+/* Footer */
+footer {
+    font-size: 14px;
+    color: #666;
+}
+
+.card {
+    max-width: 100%;
+    max-height: 500px;
+}
+
+.card img {
+    max-height: 450px;
+    width: auto;
+}
+
+
+@media (max-width: 768px) {
+    .card {
+        text-align: center;
+    }
+
+    .card img {
+        border-radius: 0;
+    }
+}
+.card {
+    max-width: 100%;
+    border-radius: 20px;
+}
+
+.card img {
+    max-height: 250px;
+    width: auto;
+}
+
+.card .btn {
+    border-radius: 8px;
+}
+
+.step-btn {
+    width: 50px;
+    height: 50px;
+    cursor: pointer; 
+}
+
+#step-image {
+    max-width: 50px;
+    height: 50px;
+}

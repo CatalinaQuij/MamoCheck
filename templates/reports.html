@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f6b5b7 !important;
+    }
+
+    .content-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding-top: 20px;
+    }
+
+    .title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #eb639c;
+        margin-bottom: 20px;
+    }
+
+    .image {
+        width: 100px;
+        margin-bottom: 15px;
+    }
+
+    .no-records {
+        font-size: 18px;
+        color:rgb(0, 0, 0);
+        margin-bottom: 15px;
+    }
+
+    .btn-test {
+        background-color: #eb639c;
+        color: white;
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+    }
+
+    .btn-test:hover {
+        background-color: #d84f87;
+    }
+
+    .report-list {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        width: 400px;
+        text-align: left;
+    }
+
+    .report-item {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .btn-container {
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btn-edit, .btn-delete {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .btn-edit {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .btn-delete {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background-color: #217dbb;
+    }
+
+    .btn-delete:hover {
+        background-color: #c0392b;
+    }
+
+</style>
+
+<div class="content-container">
+    <h2 class="title">Autoexamen Mamario</h2>
+
+    {% if reports %}
+        <div class="report-list">
+            {% for report in reports %}
+                <div class="report-item">
+                    📅 <strong>Fecha:</strong> {{ report.created_at }}<br>
+                    🆔 <strong>ID:</strong> {{ report.id }}
+                    <div class="btn-container">
+                        <a href="/reports/edit/{{ report.id }}" class="btn-edit">✏️ Editar</a>
+                        <button class="btn-delete" onclick="deleteReport('{{ report.id }}')">❌ Eliminar</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <a href="/reporte/" class="btn-test">Hacer test</a>
+    {% else %}
+        <p class="no-records">No tienes ningún registro aún.</p>
+        <a href="/reporte/" class="btn-test">Hacer test</a>
+    {% endif %}
+</div>
+
+<script>
+    async function deleteReport(reportId) {
+        if (!confirm("¿Estás seguro de que quieres eliminar este reporte?")) {
+            return;
+        }
+
+        const response = await fetch(`/reports/${reportId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (response.ok) {
+            alert("Reporte eliminado correctamente.");
+            location.reload();
+        } else {
+            alert("Error al eliminar el reporte.");
+        }
+    }
+</script>
+
+{% endblock %}

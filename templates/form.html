@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f6b5b7 !important;
+    }
+
+    .container {
+        max-width: 500px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        font-size: 22px;
+        font-weight: bold;
+        color: #eb639c;
+        text-align: center;
+    }
+
+    .form-section {
+        margin-bottom: 15px;
+    }
+
+    .form-section h3 {
+        background-color: #eb639c;
+        color: white;
+        padding: 10px;
+        font-size: 18px;
+        text-align: center;
+        border-radius: 8px;
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .checkbox-group label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .checkbox-group input {
+        accent-color: #eb639c;
+        transform: scale(1.2);
+    }
+
+    textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        resize: none;
+    }
+
+    .btn-submit {
+        background-color: #eb639c;
+        color: white;
+        font-weight: bold;
+        padding: 10px;
+        width: 100%;
+        border-radius: 8px;
+        text-align: center;
+        display: block;
+        margin-top: 10px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-submit:hover {
+        background-color: #d84f87;
+    }
+</style>
+
+<div class="container">
+    <h2>Autoexamen Mamario</h2>
+
+    <form id="reportForm">
+        <div class="form-section">
+            <label for="user_id">ID de Usuario:</label>
+            <input type="text" id="user_id" name="user_id" required>
+        </div>
+
+        <!-- Paso 1 -->
+        <div class="form-section">
+            <h3>Paso 1 - Tocar</h3>
+            <p>Haz clic en los síntomas que hayas identificado:</p>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="quistes"> Quistes en tus pechos</label>
+                <label><input type="checkbox" name="irregularidades"> Irregularidades o Hendiduras</label>
+                <label><input type="checkbox" name="granitos"> Granitos en la piel de tus pechos</label>
+                <label><input type="checkbox" name="dolor"> Dolor en Pechos o Axilas</label>
+                <label><input type="checkbox" name="hinchazon"> Hinchazón en Axilas</label>
+            </div>
+        </div>
+
+        <!-- Pezones -->
+        <div class="form-section">
+            <p>Al pinchar tus pezones...</p>
+            <div class="checkbox-group">
+                <label><input type="radio" name="secreciones" value="expulsan"> Expulsan Secreciones</label>
+                <label><input type="radio" name="secreciones" value="no_expulsan"> No expulsan nada</label>
+            </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="form-section">
+            <h3>Paso 2 - Observar</h3>
+            <p>¿Qué color tenían tus secreciones?</p>
+            <div class="checkbox-group">
+                <label><input type="radio" name="color_secrecion" value="transparente"> Transparente</label>
+                <label><input type="radio" name="color_secrecion" value="blanca"> Blanca</label>
+                <label><input type="radio" name="color_secrecion" value="rojo"> Rojo</label>
+                <label><input type="radio" name="color_secrecion" value="amarillo"> Amarillo</label>
+                <label><input type="radio" name="color_secrecion" value="verde"> Verde</label>
+                <label><input type="radio" name="color_secrecion" value="cafe"> Café</label>
+            </div>
+
+            <p>Haz clic en los síntomas que hayas identificado:</p>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="erupciones"> Erupciones</label>
+                <label><input type="checkbox" name="aumento_pechos"> Aumento en el tamaño de los pechos</label>
+                <label><input type="checkbox" name="cambios_pezon"> Cambios de Dirección en Pezones</label>
+            </div>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="form-section">
+            <h3>Paso 3 - Describir</h3>
+            <p>Si hay algún síntoma adicional, por favor descríbelo:</p>
+            <textarea name="descripcion" id="descripcion" rows="4" placeholder="Comentar aquí"></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">Enviar Reporte</button>
+    </form>
+</div>
+
+<!-- Modal de respuesta -->
+<div id="modalRecomendacion" class="modal">
+    <div class="modal-content">
+        <h3>Recomendación Médica</h3>
+        <p id="modalText"></p>
+        <button onclick="cerrarModal()">Cerrar</button>
+    </div>
+</div>
+
+<script>
+document.getElementById("reportForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+    
+    const symptoms = {};
+    ["quistes", "irregularidades", "granitos", "dolor", "hinchazon", "erupciones", "aumento_pechos", "cambios_pezon"].forEach(name => {
+        symptoms[name] = formData.has(name);
+    });
+
+    const reportData = {
+        user_id: formData.get("user_id"),
+        secreciones: formData.get("secreciones") || "",
+        color_secrecion: formData.get("color_secrecion") || "",
+        descripcion: formData.get("descripcion") || "",
+        ...symptoms
+    };
+
+    try {
+        const response = await fetch("/generate_suggestion/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(reportData)
+        });
+
+        const result = await response.json();
+        document.getElementById("modalText").innerText = result.suggestion;
+        document.getElementById("modalRecomendacion").style.display = "block";
+
+    } catch (error) {
+        alert("Error al obtener la recomendación");
+        console.error(error);
+    }
+});
+
+function cerrarModal() {
+    document.getElementById("modalRecomendacion").style.display = "none";
+}
+</script>
+
+{% endblock %}

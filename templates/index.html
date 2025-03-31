@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - MamoCheck{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <!-- Tarjeta Superior -->
+    <div class="card border-0 rounded-4 w-100" style="background-color: #fa8a9c;">
+        <div class="row g-0 align-items-center">
+            <!-- Texto y Botones -->
+            <div class="col-md-6 text-center text-md-start p-4">
+                <h1 class="fw-bold text-white mb-3">Explora tu salud mamaria!</h1>
+                <div>
+                    <a href="/register" class="btn text-white px-4 py-2" style="background-color: #f6b5b7;">Regístrate</a>
+                    <a href="/login" class="btn text-white px-4 py-2 ms-2" style="background-color: #f6b5b7;">Iniciar sesión</a>
+                </div>
+            </div>
+            <!-- Imagen -->
+            <div class="col-md-6 d-flex justify-content-end">
+                <img src="/static/img/header.png" class="img-fluid rounded-end" alt="Header">
+            </div>
+        </div>
+    </div>
+
+    <p></p><p></p><p></p><p></p>
+    
+    <!-- Sección inferior -->
+    <div class="row g-0 mt-4 w-100">
+        <!-- Columna izquierda (30%) -->
+        <div class="col-md-4 p-4 d-flex flex-column justify-content-center">
+            <h3 class="text-black fw-bold">Tu salud es importante</h3>
+            <p class="text-black">Realiza nuestro test rápido para evaluar tu salud mamaria de forma sencilla y confiable.</p>
+            <a href="#" class="btn text-white px-4 py-2" style="background-color: #eb639c; max-width: 40%; height: 40px;">Hacer test</a>
+        </div>
+
+        <!-- Columna derecha (70%) con tarjeta alineada -->
+        <div class="col-md-8 d-flex justify-content-end">
+            <div class="card rounded-3 p-3 w-100 d-flex flex-row align-items-center" style="background-color: #eb639c; max-width: 100%; height: 300px;">
+                
+                <!-- Botones Laterales -->
+                <div class="d-flex flex-column align-items-center me-3">
+                    <img src="/static/img/Paso1.png" class="step-btn mb-2" onclick="changeContent(0)">
+                    <img src="/static/img/Paso2.png" class="step-btn mb-2" onclick="changeContent(1)">
+                    <img src="/static/img/Paso3.png" class="step-btn mb-2" onclick="changeContent(2)">
+                </div>
+        
+                <!-- Contenido Izquierdo (60%) -->
+                <div class="flex-grow-1" style="width: 60%;">
+                    <h3 id="step-title" class="fw-bold text-white">Paso 1. Tocar</h3>
+                    <p id="step-description" class="text-white">
+                        Realiza una autoexploración presionando suavemente diferentes áreas del pecho para detectar posibles anomalías.
+                    </p>
+                </div>
+        
+                <!-- Imagen Derecha (40%) -->
+                <div style="width: 40%;" class="text-center">
+                    <img src="/static/img/Paso1.png" class="step-btn mb-2" onclick="changeContent(0)">
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const steps = [
+    {
+        title: "Paso 1. Tocar",
+        description: "Realiza una autoexploración presionando suavemente diferentes áreas del pecho para detectar posibles anomalías.",
+        image: "/static/img/Tocar.png"
+    },
+    {
+        title: "Paso 2. Observar",
+        description: "Este paso implica observar cualquier cambio visible en la piel, como enrojecimiento, hinchazón o cambios en el tamaño.",
+        image: "/static/img/Ver.png"
+    },
+    {
+        title: "Paso 3. Describe",
+        description: "Realiza una autoexploración presionando suavemente diferentes áreas del pecho para detectar y describir posibles anomalías.",
+        image: "/static/img/Paso3.png"
+    }
+];
+
+    function changeContent(index) {
+        document.getElementById("step-title").textContent = steps[index].title;
+        document.getElementById("step-description").textContent = steps[index].description;
+        document.getElementById("step-image").src = steps[index].image;
+    }
+</script>
+{% endblock %}
