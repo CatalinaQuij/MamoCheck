@@ -2,7 +2,9 @@
 
 Este proyecto es una API desarrollada con FastAPI y conectada a MongoDB Atlas que permite a los usuarios registrar síntomas de autoexploración mamaria. La API procesa los datos enviados y genera recomendaciones médicas automáticas.
 
+
 Características Principales
+
 🌸 API RESTful con endpoints CRUD para gestionar reportes de autoexamen.
 
 🌸 Validación de datos con Pydantic.
@@ -14,7 +16,9 @@ Características Principales
 🌸 Despliegue con Uvicorn para ejecución rápida y eficiente.
 
 
+
 🚀 Tecnologías Utilizadas
+
 🖥 Backend: FastAPI
 
 📦 Base de datos: MongoDB Atlas
