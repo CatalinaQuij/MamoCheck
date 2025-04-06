@@ -36,12 +36,12 @@ filelock==3.18.0
 fonttools==4.56.0
 frozenlist==1.5.0
 fsspec==2025.3.0
-google-ai-generativelanguage==0.6.17
+google-ai-generativelanguage
 google-api-core==2.24.2
 google-api-python-client==2.164.0
 google-auth==2.38.0
 google-auth-httplib2==0.2.0
-google-generativeai==0.8.4
+google-generativeai
 googleapis-common-protos==1.69.2
 grpcio==1.71.0
 grpcio-status==1.71.0
