@@ -1,29 +1,37 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
 
 {% block content %}
 <style>
     body {
-        background-color: #f6b5b7 !important;
-    }
-
-    .container {
-        max-width: 500px;
-        margin: auto;
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        background-color:rgb(250, 231, 231) !important;
+        margin: 0;
+        padding: 0;
     }
 
     h2 {
-        font-size: 22px;
+        font-size: 28px;
         font-weight: bold;
         color: #eb639c;
         text-align: center;
+        margin-top: 20px;
+    }
+
+    form {
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
     }
 
     .form-section {
-        margin-bottom: 15px;
+        display: none;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+
+    .form-section.active {
+        display: block;
     }
 
     .form-section h3 {
@@ -62,136 +70,196 @@
         resize: none;
     }
 
-    .btn-submit {
+    .step-buttons {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+        gap: 10px;
+    }
+    
+    .btn {
         background-color: #eb639c;
         color: white;
         font-weight: bold;
-        padding: 10px;
-        width: 100%;
+        padding: 10px 20px;
         border-radius: 8px;
-        text-align: center;
-        display: block;
-        margin-top: 10px;
         border: none;
         cursor: pointer;
     }
 
-    .btn-submit:hover {
+    .btn:hover {
         background-color: #d84f87;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        max-width: 500px;
+        margin: auto;
     }
 </style>
 
-<div class="container">
-    <h2>Autoexamen Mamario</h2>
+<h2>Autoexamen Mamario</h2>
 
-    <form id="reportForm">
-        <div class="form-section">
-            <label for="user_id">ID de Usuario:</label>
-            <input type="text" id="user_id" name="user_id" required>
+<form id="reportForm">
+    <input type="hidden" name="user_id" value="{{ user_id }}">
+
+    <!-- Paso 1 -->
+    <div class="form-section active" data-step="1">
+        <h3>Paso 1 - Tocar</h3>
+        <p>Haz clic en los síntomas que hayas identificado:</p>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="quistes"> Quistes</label>
+            <label><input type="checkbox" name="irregularidades"> Irregularidades o Hendiduras</label>
+            <label><input type="checkbox" name="granitos"> Granitos</label>
+            <label><input type="checkbox" name="dolor"> Dolor</label>
+            <label><input type="checkbox" name="hinchazon"> Hinchazón en Axilas</label>
         </div>
-
-        <!-- Paso 1 -->
-        <div class="form-section">
-            <h3>Paso 1 - Tocar</h3>
-            <p>Haz clic en los síntomas que hayas identificado:</p>
-            <div class="checkbox-group">
-                <label><input type="checkbox" name="quistes"> Quistes en tus pechos</label>
-                <label><input type="checkbox" name="irregularidades"> Irregularidades o Hendiduras</label>
-                <label><input type="checkbox" name="granitos"> Granitos en la piel de tus pechos</label>
-                <label><input type="checkbox" name="dolor"> Dolor en Pechos o Axilas</label>
-                <label><input type="checkbox" name="hinchazon"> Hinchazón en Axilas</label>
-            </div>
+        <p>Al pinchar tus pezones...</p>
+        <div class="checkbox-group">
+            <label><input type="radio" name="secreciones" value="expulsan"> Expulsan Secreciones</label>
+            <label><input type="radio" name="secreciones" value="no_expulsan"> No expulsan nada</label>
         </div>
+    </div>
 
-        <!-- Pezones -->
-        <div class="form-section">
-            <p>Al pinchar tus pezones...</p>
-            <div class="checkbox-group">
-                <label><input type="radio" name="secreciones" value="expulsan"> Expulsan Secreciones</label>
-                <label><input type="radio" name="secreciones" value="no_expulsan"> No expulsan nada</label>
-            </div>
+    <!-- Paso 2 -->
+    <div class="form-section" data-step="2">
+        <h3>Paso 2 - Observar</h3>
+        <p>¿Qué color tenían tus secreciones?</p>
+        <div class="checkbox-group">
+            <label><input type="radio" name="color_secrecion" value="transparente"> Transparente</label>
+            <label><input type="radio" name="color_secrecion" value="blanca"> Blanca</label>
+            <label><input type="radio" name="color_secrecion" value="rojo"> Roja</label>
+            <label><input type="radio" name="color_secrecion" value="amarillo"> Amarilla</label>
+            <label><input type="radio" name="color_secrecion" value="verde"> Verde</label>
+            <label><input type="radio" name="color_secrecion" value="cafe"> Café</label>
         </div>
-
-        <!-- Paso 2 -->
-        <div class="form-section">
-            <h3>Paso 2 - Observar</h3>
-            <p>¿Qué color tenían tus secreciones?</p>
-            <div class="checkbox-group">
-                <label><input type="radio" name="color_secrecion" value="transparente"> Transparente</label>
-                <label><input type="radio" name="color_secrecion" value="blanca"> Blanca</label>
-                <label><input type="radio" name="color_secrecion" value="rojo"> Rojo</label>
-                <label><input type="radio" name="color_secrecion" value="amarillo"> Amarillo</label>
-                <label><input type="radio" name="color_secrecion" value="verde"> Verde</label>
-                <label><input type="radio" name="color_secrecion" value="cafe"> Café</label>
-            </div>
-
-            <p>Haz clic en los síntomas que hayas identificado:</p>
-            <div class="checkbox-group">
-                <label><input type="checkbox" name="erupciones"> Erupciones</label>
-                <label><input type="checkbox" name="aumento_pechos"> Aumento en el tamaño de los pechos</label>
-                <label><input type="checkbox" name="cambios_pezon"> Cambios de Dirección en Pezones</label>
-            </div>
+        <p>Haz clic en los síntomas que hayas identificado:</p>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="erupciones"> Erupciones</label>
+            <label><input type="checkbox" name="aumento_pechos"> Aumento de tamaño</label>
+            <label><input type="checkbox" name="cambios_pezon"> Cambios en pezones</label>
         </div>
+    </div>
 
-        <!-- Paso 3 -->
-        <div class="form-section">
-            <h3>Paso 3 - Describir</h3>
-            <p>Si hay algún síntoma adicional, por favor descríbelo:</p>
-            <textarea name="descripcion" id="descripcion" rows="4" placeholder="Comentar aquí"></textarea>
-        </div>
+    <!-- Paso 3 -->
+    <div class="form-section" data-step="3">
+        <h3>Paso 3 - Describir</h3>
+        <p></p>
+        <p></p>
+        <p>Si hay algún sintoma adicional que no viste en el formulario y quisieras comentar, por favor describelo a continuación:</p>
+        <textarea name="descripcion" rows="4" placeholder="Comentar aquí"></textarea>
+        <p></p>
+        <p></p>
+    </div>
 
-        <button type="submit" class="btn-submit">Enviar Reporte</button>
-    </form>
-</div>
+    <div class="step-buttons">
+        <button type="button" class="btn" id="prevBtn" style="display: none;">Anterior</button>
+        <button type="button" class="btn" id="nextBtn">Siguiente</button>
+    </div>
+</form>
 
 <!-- Modal de respuesta -->
 <div id="modalRecomendacion" class="modal">
     <div class="modal-content">
         <h3>Recomendación Médica</h3>
         <p id="modalText"></p>
-        <button onclick="cerrarModal()">Cerrar</button>
+        <button onclick="cerrarModal()" class="btn">Cerrar</button>
     </div>
 </div>
 
 <script>
-document.getElementById("reportForm").addEventListener("submit", async function(event) {
-    event.preventDefault();
+    let currentStep = 0;
+    const steps = document.querySelectorAll(".form-section");
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn = document.getElementById("prevBtn");
 
-    const formData = new FormData(event.target);
+    function showStep(index) {
+        steps.forEach((step, i) => step.classList.toggle("active", i === index));
+        prevBtn.style.display = index > 0 ? "inline-block" : "none";
+        nextBtn.innerText = (index === steps.length - 1) ? "Enviar" : "Siguiente";
     
-    const symptoms = {};
-    ["quistes", "irregularidades", "granitos", "dolor", "hinchazon", "erupciones", "aumento_pechos", "cambios_pezon"].forEach(name => {
-        symptoms[name] = formData.has(name);
+        const stepButtons = document.querySelector(".step-buttons");
+        stepButtons.style.justifyContent = index === 0 ? "flex-end" : "space-between";
+    }
+    
+
+    nextBtn.addEventListener("click", () => {
+        if (currentStep < steps.length - 1) {
+            currentStep++;
+            showStep(currentStep);
+        } else {
+            document.getElementById("reportForm").dispatchEvent(new Event('submit'));
+        }
     });
 
-    const reportData = {
-        user_id: formData.get("user_id"),
-        secreciones: formData.get("secreciones") || "",
-        color_secrecion: formData.get("color_secrecion") || "",
-        descripcion: formData.get("descripcion") || "",
-        ...symptoms
-    };
+    prevBtn.addEventListener("click", () => {
+        if (currentStep > 0) {
+            currentStep--;
+            showStep(currentStep);
+        }
+    });
 
-    try {
-        const response = await fetch("/generate_suggestion/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(reportData)
+    document.getElementById("reportForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+
+        const symptoms = {};
+        ["quistes", "irregularidades", "granitos", "dolor", "hinchazon", "erupciones", "aumento_pechos", "cambios_pezon"].forEach(name => {
+            symptoms[name] = formData.has(name);
         });
 
-        const result = await response.json();
-        document.getElementById("modalText").innerText = result.suggestion;
-        document.getElementById("modalRecomendacion").style.display = "block";
+        const reportData = {
+            user_id: formData.get("user_id"),
+            secreciones: formData.get("secreciones") || "",
+            color_secrecion: formData.get("color_secrecion") || "",
+            descripcion: formData.get("descripcion") || "",
+            ...symptoms
+        };
 
-    } catch (error) {
-        alert("Error al obtener la recomendación");
-        console.error(error);
+        try {
+            const suggestionResponse = await fetch(`${window.location.origin}/symptoms/generate_suggestion/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(reportData)
+            });
+
+            const suggestionResult = await suggestionResponse.json();
+            document.getElementById("modalText").innerText = suggestionResult.suggestion;
+
+            await fetch(`/reports/${reportData.user_id}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(reportData)
+            });
+
+            document.getElementById("modalRecomendacion").style.display = "flex";
+
+        } catch (error) {
+            alert("Error al enviar el reporte");
+            console.error(error);
+        }
+    });
+
+    function cerrarModal() {
+        const userId = document.querySelector('input[name="user_id"]').value;
+        window.location.href = `/reports/${userId}`;
     }
-});
 
-function cerrarModal() {
-    document.getElementById("modalRecomendacion").style.display = "none";
-}
+    // Inicializa paso
+    showStep(currentStep);
 </script>
-
 {% endblock %}

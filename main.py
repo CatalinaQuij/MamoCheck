@@ -37,6 +37,6 @@ async def register_page(request: Request):
 async def login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
-@app.get("/reporte")
-async def login_page(request: Request):
-    return templates.TemplateResponse("form.html", {"request": request})
+@app.get("/reporte/{user_id}")
+async def report_page(request: Request, user_id: str):
+    return templates.TemplateResponse("form.html", {"request": request, "user_id": user_id})

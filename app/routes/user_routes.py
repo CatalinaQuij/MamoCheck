@@ -11,6 +11,20 @@ users_collection = database.get_collection("users")
 reports_collection = database.get_collection("reports")
 templates = Jinja2Templates(directory="templates")
 
+@router.get("/users/settings/{user_id}")
+async def user_settings_page(request: Request, user_id: str):
+    if not ObjectId.is_valid(user_id):
+        raise HTTPException(status_code=400, detail="ID no válido")
+
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    # Convertimos los valores BSON a strings/datos simples
+    user["_id"] = str(user["_id"])
+    return templates.TemplateResponse("user.html", {"request": request, "user": user})
+
+
 #  Crear Usuario (POST)
 @router.post("/users/register/")
 async def register_user(user: UserSchema):
@@ -126,5 +140,10 @@ async def user_reports_page(request: Request, user_id: str):
 
     return templates.TemplateResponse(
         "reports.html", 
-        {"request": request, "user_id": user_id, "reports": formatted_reports}
+        {
+            "request": request,
+            "user_id": user_id,
+            "username": user.get("username", "Usuario"),
+            "reports": formatted_reports
+        }
     )

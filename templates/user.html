@@ -1,0 +1,193 @@
+{% extends 'base2.html' %}
+
+{% block content %}
+<style>
+    .user-settings-container {
+        max-width: 800px;
+        margin: auto;
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    .user-settings-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .user-settings-buttons button {
+        padding: 12px 24px;
+        font-weight: bold;
+        background-color: #f17bab;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .user-settings-buttons button:hover {
+        background-color: #de679a;
+    }
+
+    .section-content {
+        display: none;
+        text-align: left;
+        background-color: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-content.active {
+        display: block;
+    }
+
+    .modal-confirm {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .modal-confirm p {
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .modal-confirm button {
+        margin: 0 10px;
+        padding: 10px 20px;
+    }
+</style>
+
+<div class="user-settings-container">
+    <h2 class="mb-4">Configuración de Usuaria</h2>
+
+    <div class="user-settings-buttons">
+        <button onclick="showSection('ver')">Ver usuaria</button>
+        <button onclick="showSection('modificar')">Modificar usuaria</button>
+        <button onclick="showSection('eliminar')">Eliminar usuaria</button>
+    </div>
+
+    <div id="section-ver" class="section-content active">
+        <p><strong>Nombre de usuaria:</strong> {{ user.username }}</p>
+        <p><strong>Edad:</strong> {{ user.age }}</p>
+        <p><strong>Ha estado embarazada:</strong> {{ 'Sí' if user.had_pregnancy else 'No' }}</p>
+    </div>
+
+    <div id="section-modificar" class="section-content">
+        <form id="editForm">
+            <input type="hidden" name="_method" value="PUT">
+            <div class="mb-3">
+                <label>Nombre de usuaria:</label>
+                <input type="text" name="username" class="form-control" value="{{ user.username }}">
+            </div>
+            <div class="mb-3">
+                <label>Edad:</label>
+                <input type="number" name="age" class="form-control" value="{{ user.age }}">
+            </div>
+            <div class="mb-3">
+                <label>Contraseña:</label>
+                <input type="password" name="password" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label>¿Ha estado embarazada?</label>
+                <select name="had_pregnancy" class="form-control">
+                    <option value="true" {% if user.had_pregnancy %}selected{% endif %}>Sí</option>
+                    <option value="false" {% if not user.had_pregnancy %}selected{% endif %}>No</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Actualizar</button>
+        </form>
+    </div>
+
+    <div id="section-eliminar" class="section-content text-center">
+        <p class="text-danger">⚠️ Esta acción eliminará permanentemente a la usuaria y no se puede deshacer.</p>
+        <button class="btn btn-danger" onclick="confirmDelete()">Eliminar usuaria</button>
+    </div>
+</div>
+
+<!-- Modal -->
+<!-- Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content modal-confirm">
+        <div class="modal-body text-center">
+          <p>¿Estás segura de que deseas eliminar tu cuenta?</p>
+          <div class="d-flex justify-content-center">
+            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-danger" onclick="deleteUser()">Sí, eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+<script>
+    function showSection(section) {
+        document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
+        document.getElementById(`section-${section}`).classList.add('active');
+    }
+
+    function confirmDelete() {
+        const modalElement = document.getElementById('deleteModal');
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
+    
+
+    document.getElementById("editForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+    
+        const userId = "{{ user._id }}";
+        const formData = new FormData(this);
+        const data = {
+            username: formData.get("username"),
+            age: parseInt(formData.get("age")),
+            password: formData.get("password"),
+            had_pregnancy: formData.get("had_pregnancy") === "true"
+        };
+    
+        const response = await fetch(`/users/${userId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+    
+        if (response.ok) {
+            alert("Usuaria actualizada correctamente.");
+            location.reload(); // O recarga la sección
+        } else {
+            const error = await response.json();
+            alert("Error: " + error.detail);
+        }
+    });
+    
+
+    async function deleteUser() {
+        const userId = "{{ user._id }}";
+        try {
+            const response = await fetch(`/users/${userId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+    
+            if (response.ok) {
+                alert("Usuaria eliminada correctamente.");
+                window.location.href = "/login"; // Redirige al login tras eliminar
+            } else {
+                const error = await response.json();
+                alert(`Error: ${error.detail}`);
+            }
+        } catch (err) {
+            alert("Error en la solicitud: " + err.message);
+        }
+    }
+    
+</script>
+{% endblock %}

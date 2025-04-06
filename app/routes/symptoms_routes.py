@@ -13,7 +13,7 @@ users_collection = database.get_collection("users")
 templates = Jinja2Templates(directory="templates")
 
 #  Crear Reporte (POST)
-@router.post("/reports/", status_code=201)
+@router.post("/reports/{user_id}", status_code=201)
 async def create_report(report: SymptomsSchema):
     """Crea un reporte con fecha de creación y lo asocia a un usuario existente"""
     
@@ -27,7 +27,6 @@ async def create_report(report: SymptomsSchema):
     report_dict = report.dict()
     report_dict["user_id"] = ObjectId(report_dict["user_id"])
     report_dict["created_at"] = datetime.utcnow()
-    report_dict["ai_messages"] = []
 
     inserted = reports_collection.insert_one(report_dict)
 
@@ -39,7 +38,7 @@ async def create_report(report: SymptomsSchema):
     return {"message": "Reporte guardado correctamente", "id": str(inserted.inserted_id)}
 
 #  Obtener Reporte por ID (GET)
-@router.get("/reports/{report_id}")
+@router.get("/reportes/{report_id}")
 async def get_report(report_id: str):
     if not ObjectId.is_valid(report_id):
         raise HTTPException(status_code=400, detail="ID no válido")
@@ -52,29 +51,6 @@ async def get_report(report_id: str):
     report["user_id"] = str(report["user_id"])
     return report
 
-#  Obtener Reportes por ID de Usuario (GET)
-@router.get("/reports/user/{user_id}")
-async def get_reports_by_user_id(user_id: str):
-    """Devuelve todos los reportes de un usuario, incluyendo fecha de creación, síntomas y mensajes de la IA"""
-
-    if not ObjectId.is_valid(user_id):
-        raise HTTPException(status_code=400, detail="ID de usuario no válido")
-
-    user = users_collection.find_one({"_id": ObjectId(user_id)})
-    if not user:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-
-    reports = list(reports_collection.find({"user_id": ObjectId(user_id)}))
-
-    for report in reports:
-        report["_id"] = str(report["_id"])
-        report["user_id"] = str(report["user_id"])
-        report["created_at"] = report.get("created_at", "Fecha no disponible")  
-        report["symptoms"] = report.get("symptoms", [])
-        report["ai_messages"] = report.get("ai_messages", [])
-
-    return {"user_id": user_id, "reports": reports}
-
 #  Obtener Todos los Reportes (GET)
 @router.get("/reports/")
 async def get_all_reports():
@@ -85,21 +61,32 @@ async def get_all_reports():
     return reports
 
 #  Actualizar Reporte (PUT)
-@router.put("/reports/{report_id}")
-async def update_report(report_id: str, report: SymptomsSchema):
-    """Actualiza un reporte existente"""
-    if not ObjectId.is_valid(report_id):
-        raise HTTPException(status_code=400, detail="ID de reporte no válido")
+@router.put("/reports/{user_id}/{report_id}")
+async def update_report(user_id: str, report_id: str, report: SymptomsSchema):
+    if not ObjectId.is_valid(user_id) or not ObjectId.is_valid(report_id):
+        raise HTTPException(status_code=400, detail="ID de usuario o de reporte no válido")
 
-    updated = database.get_collection("reports").update_one(
+    existing_report = reports_collection.find_one({
+        "_id": ObjectId(report_id),
+        "user_id": ObjectId(user_id)
+    })
+
+    if not existing_report:
+        raise HTTPException(status_code=404, detail="Reporte no encontrado o no pertenece al usuario")
+
+    updated_data = report.dict()
+    updated_data["user_id"] = ObjectId(user_id)
+
+    updated = reports_collection.update_one(
         {"_id": ObjectId(report_id)},
-        {"$set": report.dict()}
+        {"$set": updated_data}
     )
 
-    if updated.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Reporte no encontrado")
+    if updated.modified_count == 0:
+        return {"message": "No hubo cambios en el reporte"}
 
     return {"message": "Reporte actualizado correctamente"}
+
 
 #  Eliminar Reporte (DELETE)
 @router.delete("/reports/{report_id}")
@@ -119,21 +106,31 @@ async def delete_report(report_id: str):
 
     return {"message": "Reporte eliminado correctamente"}
 
-@router.get("/reports/edit/{report_id}")
-async def edit_report_page(request: Request, report_id: str):
+@router.get("/reports/edit/{user_id}/{report_id}")
+async def edit_report_page(request: Request, user_id: str, report_id: str):
     """Renderiza la página de edición del reporte"""
-    
-    if not ObjectId.is_valid(report_id):
-        raise HTTPException(status_code=400, detail="ID de reporte no válido")
 
-    report = reports_collection.find_one({"_id": ObjectId(report_id)})
+    if not ObjectId.is_valid(report_id) or not ObjectId.is_valid(user_id):
+        raise HTTPException(status_code=400, detail="ID de usuario o reporte no válido")
+
+    report = reports_collection.find_one({
+        "_id": ObjectId(report_id),
+        "user_id": ObjectId(user_id)
+    })
     if not report:
-        raise HTTPException(status_code=404, detail="Reporte no encontrado")
+        raise HTTPException(status_code=404, detail="Reporte no encontrado o no pertenece al usuario")
 
-    report["_id"] = str(report["_id"])  # Convertir ObjectId a string
+    report["_id"] = str(report["_id"])
+    report["user_id"] = str(report["user_id"])
 
-    return templates.TemplateResponse("edit_report.html", {"request": request, "report": report})
+    # Obtener el usuario para mostrar su nombre
+    username = "Usuario"
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
+    if user:
+        username = user.get("username", "Usuario")
 
-@router.post("/generate_suggestion/")
-async def generate_suggestion_route(report: ReportData):
-    return await generate_suggestion(report)
+    return templates.TemplateResponse(
+        "edit_report.html",
+        {"request": request, "report": report, "username": username}
+    )
+

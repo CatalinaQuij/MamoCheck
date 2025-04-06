@@ -1,29 +1,37 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
 
 {% block content %}
 <style>
     body {
-        background-color: #f6b5b7 !important;
-    }
-
-    .container {
-        max-width: 500px;
-        margin: auto;
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        background-color: rgb(250, 231, 231) !important;
+        margin: 0;
+        padding: 0;
     }
 
     h2 {
-        font-size: 22px;
+        font-size: 28px;
         font-weight: bold;
         color: #eb639c;
         text-align: center;
+        margin-top: 20px;
+    }
+
+    form {
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
     }
 
     .form-section {
-        margin-bottom: 15px;
+        display: none;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+
+    .form-section.active {
+        display: block;
     }
 
     .form-section h3 {
@@ -62,149 +70,189 @@
         resize: none;
     }
 
-    .btn-submit {
+    .step-buttons {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+        gap: 10px;
+    }
+
+    .btn {
         background-color: #eb639c;
         color: white;
         font-weight: bold;
-        padding: 10px;
-        width: 100%;
+        padding: 10px 20px;
         border-radius: 8px;
-        text-align: center;
-        display: block;
-        margin-top: 10px;
         border: none;
         cursor: pointer;
     }
 
-    .btn-submit:hover {
+    .btn:hover {
         background-color: #d84f87;
     }
 </style>
 
-<div class="container">
-    <h2>Editar Reporte de Autoexamen Mamario</h2>
+<h2>Editar Autoexamen Mamario</h2>
 
-    <form id="editReportForm">
-        <div class="form-section">
-            <label for="user_id">ID de Usuario:</label>
-            <input type="text" id="user_id" name="user_id">
+<form id="editReportForm">
+
+    <input type="hidden" id="report_id" value="{{ report._id }}">
+    <input type="hidden" id="user_id" value="{{ report.user_id | string }}">
+
+
+    <div class="form-section active" data-step="0">
+        <h3>Paso 1 - Tocar</h3>
+        <p>Haz clic en los síntomas que hayas identificado:</p>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="quistes"> Quistes</label>
+            <label><input type="checkbox" name="irregularidades"> Irregularidades o Hendiduras</label>
+            <label><input type="checkbox" name="granitos"> Granitos</label>
+            <label><input type="checkbox" name="dolor"> Dolor</label>
+            <label><input type="checkbox" name="hinchazon"> Hinchazón en Axilas</label>
         </div>
-
-        <!-- Paso 1 -->
-        <div class="form-section">
-            <h3>Paso 1 - Tocar</h3>
-            <p>Haz clic en los síntomas que hayas identificado:</p>
-            <div class="checkbox-group">
-                <label><input type="checkbox" id="quistes" name="quistes"> Quistes en tus pechos</label>
-                <label><input type="checkbox" id="irregularidades" name="irregularidades"> Irregularidades o Hendiduras</label>
-                <label><input type="checkbox" id="granitos" name="granitos"> Granitos en la piel de tus pechos</label>
-                <label><input type="checkbox" id="dolor" name="dolor"> Dolor en Pechos o Axilas</label>
-                <label><input type="checkbox" id="hinchazon" name="hinchazon"> Hinchazón en Axilas</label>
-            </div>
+        <p>Al pinchar tus pezones...</p>
+        <div class="checkbox-group">
+            <label><input type="radio" name="secreciones" value="expulsan"> Expulsan Secreciones</label>
+            <label><input type="radio" name="secreciones" value="no_expulsan"> No expulsan nada</label>
         </div>
+    </div>
 
-        <!-- Pezones -->
-        <div class="form-section">
-            <p>Al pinchar tus pezones...</p>
-            <div class="checkbox-group">
-                <label><input type="radio" name="secreciones" value="expulsan"> Expulsan Secreciones</label>
-                <label><input type="radio" name="secreciones" value="no_expulsan"> No expulsan nada</label>
-            </div>
+    <div class="form-section" data-step="1">
+        <h3>Paso 2 - Observar</h3>
+        <p>¿Qué color tenían tus secreciones?</p>
+        <div class="checkbox-group">
+            <label><input type="radio" name="color_secrecion" value="transparente"> Transparente</label>
+            <label><input type="radio" name="color_secrecion" value="blanca"> Blanca</label>
+            <label><input type="radio" name="color_secrecion" value="rojo"> Roja</label>
+            <label><input type="radio" name="color_secrecion" value="amarillo"> Amarilla</label>
+            <label><input type="radio" name="color_secrecion" value="verde"> Verde</label>
+            <label><input type="radio" name="color_secrecion" value="cafe"> Café</label>
         </div>
-
-        <!-- Paso 2 -->
-        <div class="form-section">
-            <h3>Paso 2 - Observar</h3>
-            <p>¿Qué color tenían tus secreciones?</p>
-            <div class="checkbox-group">
-                <label><input type="radio" name="color_secrecion" value="transparente"> Transparente</label>
-                <label><input type="radio" name="color_secrecion" value="blanca"> Blanca</label>
-                <label><input type="radio" name="color_secrecion" value="rojo"> Rojo</label>
-                <label><input type="radio" name="color_secrecion" value="amarillo"> Amarillo</label>
-                <label><input type="radio" name="color_secrecion" value="verde"> Verde</label>
-                <label><input type="radio" name="color_secrecion" value="cafe"> Café</label>
-            </div>
-
-            <p>Haz clic en los síntomas que hayas identificado:</p>
-            <div class="checkbox-group">
-                <label><input type="checkbox" id="erupciones" name="erupciones"> Erupciones</label>
-                <label><input type="checkbox" id="aumento_pechos" name="aumento_pechos"> Aumento en el tamaño de los pechos</label>
-                <label><input type="checkbox" id="cambios_pezon" name="cambios_pezon"> Cambios de Dirección en Pezones</label>
-            </div>
+        <p>Haz clic en los síntomas que hayas identificado:</p>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="erupciones"> Erupciones</label>
+            <label><input type="checkbox" name="aumento_pechos"> Aumento de tamaño</label>
+            <label><input type="checkbox" name="cambios_pezon"> Cambios en pezones</label>
         </div>
+    </div>
 
-        <!-- Paso 3 -->
-        <div class="form-section">
-            <h3>Paso 3 - Describir</h3>
-            <p>Si hay algún síntoma adicional, por favor descríbelo:</p>
-            <textarea name="descripcion" id="descripcion" rows="4" placeholder="Comentar aquí"></textarea>
-        </div>
+    <div class="form-section" data-step="2">
+        <h3>Paso 3 - Describir</h3>
+        <p>Si hay algún sintoma adicional que no viste en el formulario y quisieras comentar, por favor describelo a continuación:</p>
+        <textarea name="descripcion" rows="4" placeholder="Comentar aquí"></textarea>
+    </div>
 
-        <button type="submit" class="btn-submit">Actualizar Reporte</button>
-    </form>
-</div>
+    <div class="step-buttons">
+        <button type="button" class="btn" id="prevBtn" style="display: none;">Anterior</button>
+        <button type="button" class="btn" id="nextBtn">Siguiente</button>
+    </div>
+</form>
 
 <script>
-    function getReportIdFromPath() {
-        const pathSegments = window.location.pathname.split("/");  // Divide la URL en partes
-        return pathSegments[pathSegments.length - 1]; // Toma la última parte (el ID)
+    const steps = document.querySelectorAll(".form-section");
+    let currentStep = 0;
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    const showStep = (index) => {
+        const stepButtons = document.querySelector(".step-buttons");
+        stepButtons.style.justifyContent = index === 0 ? "flex-end" : "space-between";
+
+        steps.forEach((step, i) => {
+            step.classList.toggle("active", i === index);
+        });
+        prevBtn.style.display = index > 0 ? "inline-block" : "none";
+        nextBtn.innerText = index === steps.length - 1 ? "Actualizar" : "Siguiente";
+    };
+
+    prevBtn.addEventListener("click", () => {
+        if (currentStep > 0) currentStep--;
+        showStep(currentStep);
+    });
+
+    nextBtn.addEventListener("click", async () => {
+        if (currentStep < steps.length - 1) {
+            currentStep++;
+            showStep(currentStep);
+        } else {
+            await submitForm();
+        }
+    });
+
+    const reportId = document.getElementById("report_id").value;
+    const userId = document.getElementById("user_id").value;
+
+
+    async function loadData() {
+        try {
+            const res = await fetch(`/reportes/${reportId}`);
+            const data = await res.json();
+    
+            document.getElementById("user_id").value = data.user_id;
+    
+            // Recorremos todos los campos de la respuesta
+            for (let key in data) {
+                const elList = document.querySelectorAll(`[name="${key}"]`);
+                
+                if (elList.length > 1) {
+                    elList.forEach(input => {
+                        if (input.type === "checkbox") {
+                            input.checked = data[key] === true || data[key] === "true";
+                        } else if (input.type === "radio") {
+                            input.checked = input.value === data[key];
+                        }
+                    });
+                } else {
+                    const el = document.querySelector(`[name="${key}"]`);
+                    if (el) {
+                        if (el.type === "checkbox") {
+                            el.checked = data[key] === true || data[key] === "true";
+                        } else if (el.tagName === "TEXTAREA") {
+                            el.value = data[key] || '';
+                        } else {
+                            el.value = data[key];
+                        }
+                    }
+                }
+            }
+            
+    
+        } catch (e) {
+            console.error("Error cargando datos:", e);
+            alert("No se pudo cargar el reporte.");
+        }
     }
     
-    document.addEventListener("DOMContentLoaded", async function () {
-        const reportId = getReportIdFromPath();
-    
-        if (!reportId) {
-            alert("No se ha encontrado un ID de reporte válido.");
-            return;
-        }
-    
-        document.getElementById("editReportForm").addEventListener("submit", async function (event) {
-            event.preventDefault();
-    
-            const userId = document.getElementById("user_id").value.trim();  // 💡 Obtener `user_id`
-            if (!userId) {
-                alert("No se ha encontrado un ID de usuario.");
-                return;
-            }
-    
-            const updatedData = {
-                user_id: userId,  // 🔥 Ahora lo enviamos correctamente
-                secreciones: document.querySelector('input[name="secreciones"]:checked')?.value || null,
-                color_secrecion: document.querySelector('input[name="color_secrecion"]:checked')?.value || null,
-                descripcion: document.getElementById("descripcion").value.trim() || null,
-                quistes: document.getElementById("quistes").checked,
-                irregularidades: document.getElementById("irregularidades").checked,
-                granitos: document.getElementById("granitos").checked,
-                dolor: document.getElementById("dolor").checked,
-                hinchazon: document.getElementById("hinchazon").checked,
-                erupciones: document.getElementById("erupciones").checked,
-                aumento_pechos: document.getElementById("aumento_pechos").checked,
-                cambios_pezon: document.getElementById("cambios_pezon").checked
-            };
-    
-            console.log("Enviando datos:", JSON.stringify(updatedData, null, 2));  // 🔍 Verifica en la consola
-    
-            try {
-                const putResponse = await fetch(`/reports/${reportId}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(updatedData)
-                });
-    
-                const responseData = await putResponse.json();
-                console.log("Respuesta del servidor:", responseData);
-    
-                if (!putResponse.ok) {
-                    throw new Error(responseData.detail || "Error al actualizar el reporte.");
-                }
-    
-                alert("Reporte actualizado correctamente!");
-            } catch (error) {
-                console.error("Error actualizando el reporte:", error);
-                alert("Error al actualizar el reporte.");
-            }
+    async function submitForm() {
+        const formData = new FormData(document.getElementById("editReportForm"));
+        const json = {};
+        formData.forEach((value, key) => {
+            json[key] = value;
+        });        
+
+        const booleanFields = ["quistes", "irregularidades", "granitos", "dolor", "hinchazon", "erupciones", "aumento_pechos", "cambios_pezon"];
+        booleanFields.forEach(field => {
+            json[field] = document.querySelector(`[name="${field}"]`).checked;
         });
-    });
+
+        try {
+            const res = await fetch(`/reports/${userId}/${reportId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(json),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || "Error actualizando");
+
+            alert("Reporte actualizado con éxito!");
+        } catch (e) {
+            console.error(e);
+            alert("Hubo un problema al actualizar.");
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadData);
 </script>
 
 {% endblock %}

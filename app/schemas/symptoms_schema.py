@@ -3,7 +3,7 @@ from typing import Dict, Optional
 from bson import ObjectId
 
 class SymptomsSchema(BaseModel):
-    user_id: str
+    user_id: Optional[str]= None
     secreciones: Optional[str] = None
     color_secrecion: Optional[str] = None
     quistes: bool = False
