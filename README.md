@@ -1,5 +1,10 @@
 🌸 Autoexamen Mamario - API con FastAPI
 
+
+Entra Aquí! https://mamocheck-production.up.railway.app/
+
+
+
 Este proyecto es una API desarrollada con FastAPI y conectada a MongoDB Atlas que permite a los usuarios registrar síntomas de autoexploración mamaria. La API procesa los datos enviados y genera recomendaciones médicas automáticas.
 
 
